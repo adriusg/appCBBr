@@ -1,0 +1,32 @@
+image:
+  file: Dockerfile
+
+ports:
+  - port: 8001
+
+tasks:
+  -  init: mkdir /workspace/appCBBr/logs                                  &&
+           touch /workspace/appCBBr/logs.txt
+
+
+  -  command: echo "Start the .gitpod.yml installation\n"         &>> /workspace/appCBBr/logs.txt  &&
+
+              echo "Install Android SDK \n"                       &>> /workspace/appCBBr/logs.txt  &&
+              yes | sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28"                             &&
+
+              echo "Setting bash files to be runnable\n"          &>> /workspace/appCBBr/logs.txt  &&
+              chmod +x /workspace/appCBBr/a01-create.sh                                            &&
+              chmod +x /workspace/appCBBr/a02-re-build.sh                                          &&
+              chmod +x /workspace/appCBBr/a03-copy-to-folder.sh                                    &&
+              chmod +x /workspace/appCBBr/a04-read-Docker-log.sh                                   &&
+
+              echo "Starting Apache\n"                            &>> /workspace/appCBBr/logs.txt  &&
+              apachectl start                                                                                           &&
+              gp await-port 8001                                                                                        &&
+              gp preview $(gp url 8001)                                                                                 &&
+
+              echo "Last line in logs\n"                          &>> /workspace/appCBBr/logs.txt
+
+
+  -	command: rm -rf node_modules && npm install
+  - command: npm i -g node@latest ionic
